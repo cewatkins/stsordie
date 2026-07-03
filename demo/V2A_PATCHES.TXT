@@ -1,0 +1,71 @@
+V2A01.EXE (from PCH01.EXE): selector_c5
+V2A02.EXE (from PCH02.EXE): selector_c5, safe_stubs
+V2A03.EXE (from PCH03.EXE): selector_c5, nop_call3
+V2A04.EXE (from PCH04.EXE): selector_c5, safe_stubs, nop_call3
+V2A05.EXE (from PCH05.EXE): selector_c5, nop_call3, nop_call4
+V2A06.EXE (from PCH06.EXE): selector_c5, safe_stubs, nop_call3, nop_call4
+V2A07.EXE (from PCH07.EXE): skip_reboot_call
+V2A08.EXE (from PCH08.EXE): skip_reboot_call, safe_stubs
+V2A09.EXE (from PCH09.EXE): cmp_c5, skip_reboot_call
+V2A10.EXE (from PCH10.EXE): jnz_to_jmp, safe_stubs
+V2A11.EXE (from PCH11.EXE): selector_c5, skip_reboot_call
+V2A12.EXE (from PCH12.EXE): selector_c5, skip_reboot_call, safe_stubs
+V2A13.EXE (from PCH13.EXE): selector_c5, cmp_c5, skip_reboot_call
+V2A14.EXE (from PCH14.EXE): selector_c5, cmp_c5, skip_reboot_call, safe_stubs
+V2A15.EXE (from PCH15.EXE): nop_call3
+V2A16.EXE (from PCH16.EXE): nop_call3, safe_stubs
+V2A17.EXE (from PCH17.EXE): nop_call4
+V2A18.EXE (from PCH18.EXE): skip_reboot_call, nop_call3
+V2A19.EXE (from PCH19.EXE): skip_reboot_call, safe_stubs, nop_call3
+V2A20.EXE (from PCH20.EXE): selector_c5, jnz_to_jmp, safe_stubs
+V2A21.EXE (from PCH21.EXE): csip_1978_retguard
+V2A22.EXE (from PCH22.EXE): selector_c5, csip_1978_retguard
+V2A23.EXE (from PCH23.EXE): selector_c5, safe_stubs, csip_1978_retguard
+V2A24.EXE (from PCH24.EXE): skip_reboot_call, csip_1978_retguard
+V2A25.EXE (from PCH25.EXE): skip_reboot_call, safe_stubs, csip_1978_retguard
+V2A26.EXE (from PCH26.EXE): selector_c5, jnz_to_jmp, safe_stubs, csip_1978_retguard
+V2A27.EXE (from PCH27.EXE): selector_c5, safe_stubs, csip_probe_cc
+V2A28.EXE (from PCH28.EXE): skip_reboot_call, safe_stubs, csip_probe_cc
+V2A29.EXE (from PCH29.EXE): selector_c5, jnz_to_jmp, safe_stubs, csip_probe_cc
+V2A30.EXE (from PCH30.EXE): selector_c5, safe_stubs, force_jz_taken
+V2A31.EXE (from PCH31.EXE): selector_c5, safe_stubs, force_jz_not_taken
+V2A32.EXE (from PCH32.EXE): selector_c5, safe_stubs, force_zf1_no_memread
+V2A33.EXE (from PCH33.EXE): selector_c5, safe_stubs, force_zf0_no_memread
+V2A34.EXE (from PCH34.EXE): skip_reboot_call, safe_stubs, force_zf1_no_memread
+V2A35.EXE (from PCH35.EXE): skip_reboot_call, safe_stubs, force_zf0_no_memread
+V2A36.EXE (from PCH36.EXE): selector_c5, safe_stubs, probe_path_a_cc
+V2A37.EXE (from PCH37.EXE): selector_c5, safe_stubs, probe_path_b_cc
+V2A38.EXE (from PCH38.EXE): skip_reboot_call, safe_stubs, probe_path_a_cc
+V2A39.EXE (from PCH39.EXE): skip_reboot_call, safe_stubs, probe_path_b_cc
+V2A40.EXE (from PCH40.EXE): selector_c5, safe_stubs, midop_c2_to_c3
+V2A41.EXE (from PCH41.EXE): skip_reboot_call, safe_stubs, midop_c2_to_c3
+V2A42.EXE (from PCH42.EXE): selector_c5, safe_stubs, midop_nop3
+V2A43.EXE (from PCH43.EXE): skip_reboot_call, safe_stubs, midop_nop3
+V2A44.EXE (from PCH44.EXE): selector_c5, safe_stubs, midop_c2_to_cb
+V2A45.EXE (from PCH45.EXE): skip_reboot_call, safe_stubs, midop_c2_to_cb
+V2A46.EXE (from PCH46.EXE): selector_c5, safe_stubs, midop_cb9090
+V2A47.EXE (from PCH47.EXE): skip_reboot_call, safe_stubs, midop_cb9090
+V2A48.EXE (from PCH48.EXE): selector_c5, safe_stubs, midop_jmp_197f
+V2A49.EXE (from PCH49.EXE): skip_reboot_call, safe_stubs, midop_jmp_197f
+V2A50.EXE (from PCH50.EXE): selector_c5, safe_stubs, midop_jmp_1985
+V2A51.EXE (from PCH51.EXE): skip_reboot_call, safe_stubs, midop_jmp_1985
+V2A52.EXE (from PCH52.EXE): selector_c5, safe_stubs, midop_jmp_1992
+V2A53.EXE (from PCH53.EXE): skip_reboot_call, safe_stubs, midop_jmp_1992
+V2A54.EXE (from PCH54.EXE): selector_c5, safe_stubs, midop_jmp_1998
+V2A55.EXE (from PCH55.EXE): skip_reboot_call, safe_stubs, midop_jmp_1998
+V2A56.EXE (from PCH56.EXE): selector_c5, safe_stubs, midop_jmp_19a0
+V2A57.EXE (from PCH57.EXE): skip_reboot_call, safe_stubs, midop_jmp_19a0
+V2A58.EXE (from PCH58.EXE): selector_c5, safe_stubs, midop_jmp_1c08
+V2A59.EXE (from PCH59.EXE): skip_reboot_call, safe_stubs, midop_jmp_1c08
+V2A60.EXE (from PCH60.EXE): selector_c5, safe_stubs, midop_jmp_1c0b
+V2A61.EXE (from PCH61.EXE): skip_reboot_call, safe_stubs, midop_jmp_1c0b
+V2A62.EXE (from PCH62.EXE): selector_c5, safe_stubs, midop_jmp_1c08, probe_1a05
+V2A63.EXE (from PCH63.EXE): selector_c5, safe_stubs, midop_jmp_1c08, probe_1b5e
+V2A64.EXE (from PCH64.EXE): selector_c5, safe_stubs, midop_jmp_1c08, probe_1c03
+V2A65.EXE (from PCH65.EXE): skip_reboot_call, safe_stubs, midop_jmp_1c08, probe_1c03
+V2A66.EXE (from PCH66.EXE): selector_c5, safe_stubs, bypass_call_2b82
+V2A67.EXE (from PCH67.EXE): selector_c5, safe_stubs, bypass_call_2bb2
+V2A68.EXE (from PCH68.EXE): selector_c5, safe_stubs, bypass_call_2b82, bypass_call_2bb2
+V2A69.EXE (from PCH69.EXE): selector_c5, safe_stubs, midop_jmp_1c08, bypass_call_2b82, bypass_call_2bb2
+V2A70.EXE (from PCH70.EXE): selector_c5, safe_stubs, bypass_call_0ee8, bypass_call_2b82, bypass_call_2bb2
+V2A71.EXE (from PCH71.EXE): skip_reboot_call, safe_stubs, bypass_call_0ee8, bypass_call_2b82, bypass_call_2bb2

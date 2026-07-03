@@ -1,0 +1,26 @@
+INT 6 capture (reliable method using DOS DEBUG)
+
+1) Start DOSBox-X in the demo folder as usual.
+2) At DOS prompt run:
+   SETDBG.BAT PCH12.EXE
+   (or replace PCH12.EXE with PCH19.EXE / PCH06.EXE etc.)
+3) In DEBUG prompt type:
+   g
+4) When fault happens, DEBUG should break and show registers.
+5) Type:
+   r
+6) Report these values exactly:
+   CS=XXXX
+   IP=XXXX
+7) Also capture bytes/instructions at fault:
+   u cs:ip
+   d cs:ip
+8) Paste back:
+   filename tested
+   CS:IP
+   first 5 lines from 'u cs:ip'
+   first 2 lines from 'd cs:ip'
+
+Optional: If DEBUG does not trap, use DOSBox-X startup break mode:
+   dosbox-x -break-start -debug -defaultdir /home/oo/sb/demo
+Then run SETDBG.BAT inside DOS once the shell appears.

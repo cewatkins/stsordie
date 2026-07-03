@@ -1,0 +1,16 @@
+demo-900-basejmp: V2D90BJ.EXE: selector_c5, midop_jmp_1c08
+demo-900-cb: V2D90CB.EXE: selector_c5, nop_call3, nop_call4, midop_c2_to_cb
+demo-900-j1992: V2D9292.EXE: selector_c5, nop_call3, nop_call4, midop_jmp_1992
+demo-900-j19a0: V2D92A0.EXE: selector_c5, nop_call3, nop_call4, midop_jmp_19a0
+demo-900-target: V2D900.EXE: selector_c5, nop_call3, nop_call4, midop_jmp_1c08
+demo-9292-jzsafe: V2D92NS.EXE: selector_c5, nop_call3, nop_call4, midop_jmp_1992, force_jz_not_taken
+demo-9292-jztaken: V2D92JT.EXE: selector_c5, nop_call3, nop_call4, midop_jmp_1992, force_jz_taken
+demo-9292-zf1: V2D92ZF.EXE: selector_c5, nop_call3, nop_call4, midop_jmp_1992, force_zf1_no_memread
+demo-dat-j1992: V2DD992.EXE: selector_c5, midop_jmp_1992
+demo-dat-j1992-ns: V2DD99N.EXE: selector_c5, midop_jmp_1992, force_jz_not_taken
+demo-dat-j1992-zf1: V2DD99Z.EXE: selector_c5, midop_jmp_1992, force_zf1_no_memread
+demo-dat-j19a0: V2DD9A0.EXE: selector_c5, midop_jmp_19a0
+demo-min: V2DMIN.EXE: selector_c5
+demo-noenv: V2DNOEV.EXE: selector_c5, nop_call3, nop_call4
+demo-noenv-skipreboot: V2DNONR.EXE: selector_c5, nop_call3, nop_call4, skip_reboot_call
+demo-safe: V2DSAFE.EXE: selector_c5, safe_stubs
