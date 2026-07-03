@@ -1,7 +1,23 @@
-# DOSBox-X Debugger Walkthrough — STS-12UC.EXE
+# DOSBox-X Built-in Debugger Walkthrough — STS-12UC.EXE
 
 **Target:** `STS12UC.EXE` (baseline SHA1: `120f8d982a31de4bdd5292b65264491af0a2c11a`)
-**Goal:** Step through from boot to card type gate, demo mode selection, and user login progression using DOSBox-X built-in debugger.
+**Goal:** Step through from boot to card type gate, demo mode selection, and user login progression using DOSBox-X's **built-in debugger** (not the DOS DEBUG program).
+
+---
+
+## 0. Critical Distinction — Two Debuggers
+
+DOSBox-X has **two** separate debugging mechanisms. Do not confuse them:
+
+| | **DOSBox-X Built-in Debugger** | **DOS DEBUG Program** |
+|---|---|-|
+| **What it is** | Emulator-level debugger built into DOSBox-X | Classic MS-DOS debugger program (DEBUG.COM) that runs inside DOS |
+| **How to access** | `-break-start -debug` flags on launch | Type `DEBUG` at DOS prompt |
+| **Debugger commands** | `bpx`, `bpd`, `g`, `t`, `u`, `d`, `r`, `q`, `h`, `mem`, `cpu`, `int`, `port`, `seg`, `stack`, `log`, `trace` | `t`, `p`, `g`, `u`, `d`, `r`, `bpx`, `bpd`, `e`, `q`, `h` |
+| **Scope** | Can pause emulator at any time, inspect CPU/memory/ports/segments | Only works while DOS program is running, limited to DOS memory |
+| **Best for** | Hardware debugging, port I/O, ROM inspection, emulator state | In-DOS debugging, file I/O tracing, program-level stepping |
+
+**This document covers the DOSBox-X Built-in Debugger.** For DOS DEBUG instructions, see `02-tool-instructions.md` Section 4.
 
 ---
 
@@ -10,7 +26,7 @@
 ### POLL=1 vs POLL=0
 
 | POLL Value | Behavior |
-|------|--|------|
+|------|--|--|
 | **`POLL=1`** | Enables **polling mode** for COM3 and COM4. The BBS actively polls these ports for activity instead of relying on interrupt-driven detection. Use this when COM3/COM4 are **not connected** to real hardware — polling prevents the program from hanging waiting for a card interrupt. |
 | **`POLL=0`** (or unset) | Uses **interrupt-driven** detection. The program waits for the expansion card to signal activity via IRQ. Requires the actual 16-channel serial card hardware present. |
 
@@ -47,7 +63,7 @@ This tells the program:
 
 ---
 
-## 2. Starting DOSBox-X Debugger
+## 2. Starting DOSBox-X Built-in Debugger
 
 ### 2.1 Configuration
 
@@ -99,9 +115,65 @@ The debugger will pause at the entry point. You should see the DOSBox-X debugger
 
 ---
 
-## 3. Stepping Through — From Entry to Card Type Gate
+## 3. DOSBox-X Debugger Commands Reference
 
-### 3.1 At the Entry Point
+### 3.1 Navigation Commands
+
+| Command | Description |
+|---------|---|
+| `g` | Go — run until next breakpoint or crash |
+| `g <address>` | Go to address (runs until you reach it) |
+| `t` | Trace — step one instruction (follows CALLs) |
+| `p` | Step over — step one instruction (skips CALLs) |
+| `x <address>` | Execute — run to address (alias for `g`) |
+| `q` | Quit debugger — return to DOS prompt |
+
+### 3.2 Inspection Commands
+
+| Command | Description |
+|---------|---|
+| `r` | Show all CPU registers |
+| `r <reg>` | Show specific register (e.g., `r AX`, `r CS`, `r IP`) |
+| `u <address>` | Unassemble at address |
+| `u <start> <end>` | Unassemble range |
+| `d <address>` | Dump memory at address |
+| `d <start> <end>` | Dump memory range |
+| `mem` | Show memory map (segments, free memory) |
+| `cpu` | Show CPU info (mode, features, flags) |
+| `seg <segment>` | Show segment info (base, limit, type) |
+| `stack` | Show stack pointer and top of stack |
+| `int` | Show interrupt vector table |
+| `port` | Show I/O port status |
+
+### 3.3 Breakpoint Commands
+
+| Command | Description |
+|---------|---|
+| `bpx <address>` | Set hardware breakpoint at address |
+| `bpx <segment>:<offset>` | Set hardware breakpoint at segment:offset |
+| `bpd` | Delete all breakpoints |
+| `bpd <n>` | Delete breakpoint number n |
+| `bpe` | Enable all breakpoints |
+| `bpd` (with list) | List all breakpoints |
+
+### 3.4 Debugging Utilities
+
+| Command | Description |
+|---------|---|
+| `h` | Show help |
+| `log` | Toggle INT 21h logging |
+| `trace` | Enable trace mode (log every instruction) |
+| `tracefile <filename>` | Write trace log to file |
+| `i <port>` | Input byte from I/O port |
+| `o <port> <value>` | Output byte to I/O port |
+| `s <start> <end> <pattern>` | Search memory for pattern |
+| `c <start1> <end1> <start2>` | Compare memory ranges |
+
+---
+
+## 4. Stepping Through — From Entry to Card Type Gate
+
+### 4.1 At the Entry Point
 
 When the debugger pauses, you're at the EXE entry point:
 
@@ -119,12 +191,12 @@ File Offset    Address       Instruction
 0x13D78        seg000:C638  CALL FAR 46E3:0000   ; Another init function
 ```
 
-### 3.2 Step-by-Step Debugger Commands
+### 4.2 Step-by-Step Debugger Commands
 
-#### Option A: Trace Into Each Call (T = Trace Into)
+#### Option A: Trace Into Each Call (t = Trace Into)
 
 ```
-# At the debugger prompt, type:
+# At the DOSBox-X debugger prompt, type:
 t
 ```
 
@@ -140,22 +212,23 @@ Each `t` steps **into** the next instruction (follows CALLs).
 
 4. **Next `t`** — Enters the **demo/card init wrapper** at `4745:008A` (file `0x04EC1A`). **This is the critical function.**
 
-#### Option B: Run to a Specific Address (G = Go)
+#### Option B: Set Breakpoint and Go
 
 If you want to jump directly to the card type gate:
 
 ```
-# First, find the address of the card type gate
-# It's at file offset 0x04EB90, which maps to a runtime address
+# Set a breakpoint at the demo/card init wrapper
+bpx 4745:008A
 
-# Set a breakpoint at the card type gate function
-bpx 4745:008A    ; Break at demo/card init wrapper
+# Run to the breakpoint
+g
 
-# Or run directly to it
-g 4745:008A      ; Go to address (runs until you reach it)
+# When it hits, inspect
+u 4745:008A 4745:0100
+r
 ```
 
-### 3.3 Inspecting the Card Type Gate
+### 4.3 Inspecting the Card Type Gate
 
 When you reach the card type gate at file offset `0x04EB90`:
 
@@ -183,7 +256,7 @@ loc_4EC16:
 ; ... return ...
 ```
 
-### 3.4 Key Decision Points
+### 4.4 Key Decision Points
 
 #### Decision 1: Card Type Check
 
@@ -225,9 +298,9 @@ After the card type gate (if demo mode is forced), the program enters user login
 
 ---
 
-## 4. Complete Debugger Session — Full Walkthrough
+## 5. Complete Debugger Session — Full Walkthrough
 
-### 4.1 Full Session Script
+### 5.1 Full Session Script
 
 ```bash
 # Terminal 1: Start DOSBox-X with debugger
@@ -242,7 +315,7 @@ SET POLL=1
 STS12UC.EXE
 ```
 
-### 4.2 Step-by-Step Commands
+### 5.2 Step-by-Step Commands
 
 ```
 # You're now at the entry point (seg000:C629)
@@ -295,7 +368,7 @@ t
 # Program continues to user login
 ```
 
-### 4.3 Inspecting Memory at Key Points
+### 5.3 Inspecting Memory at Key Points
 
 ```
 # At the card type gate, inspect the local variable
@@ -309,13 +382,23 @@ d 01385A 013865     ; Show Pascal shortstrings (NOCOM1, NOCOM2, etc.)
 
 # Inspect entry point bytes
 u 13D69 13DB0       ; Show all 23 CALL FAR instructions
+
+# Show memory map
+mem
+
+# Show CPU state
+cpu
+
+# Show segment info
+seg 0000
+seg 4745
 ```
 
 ---
 
-## 5. Debugging Patched Variants
+## 6. Debugging Patched Variants
 
-### 5.1 Patched with selector_c5 (0x04EB99 99→C5)
+### 6.1 Patched with selector_c5 (0x04EB99 99→C5)
 
 ```bash
 # Run the patched variant
@@ -334,7 +417,7 @@ V2D9292.EXE
 - User #0 stall (if midop patches are wrong)
 - User #4 stall (known limitation)
 
-### 5.2 Patched with selector_c5 + safe_stubs
+### 6.2 Patched with selector_c5 + safe_stubs
 
 ```bash
 SETCO
@@ -347,7 +430,7 @@ V2DSAFE.EXE
 - No INT 6 from dispatch stubs
 - Still may stall at user #4 (midop region)
 
-### 5.3 Patched with selector_c5 + midop_jmp_1992
+### 6.3 Patched with selector_c5 + midop_jmp_1992
 
 ```bash
 SETCO
@@ -359,47 +442,6 @@ V2D9292.EXE
 - Midop region redirected to 1992
 - Reaches user #4 (best progress)
 - INT 6 after user #4 (unknown cause)
-
----
-
-## 6. Common Debugger Commands Reference
-
-### Navigation
-
-| Command | Description |
-|---------|-----|
-| `t` | Trace into (step into CALLs) |
-| `p` | Trace over (step over CALLs) |
-| `g` | Go (run until next breakpoint or crash) |
-| `g <address>` | Go to address |
-| `u <start> <end>` | Unassemble range |
-| `u <address>` | Unassemble at address |
-
-### Inspection
-
-| Command | Description |
-|---------|-----|
-| `r` | Show all registers |
-| `r AX` | Show specific register |
-| `d <start> <end>` | Dump memory range |
-| `d <address>` | Dump at address |
-| `e <address> <bytes>` | Edit memory bytes |
-
-### Breakpoints
-
-| Command | Description |
-|---------|-----|
-| `bpx <address>` | Set hardware breakpoint |
-| `bpd` | Delete all breakpoints |
-| `bpe` | Enable all breakpoints |
-| `bpd <n>` | Delete breakpoint n |
-
-### Stack
-
-| Command | Description |
-|---------|-----|
-| `d ss:SP` | Dump stack |
-| `d BP-10h BP+10h` | Dump around frame pointer |
 
 ---
 
@@ -489,7 +531,7 @@ loc_4EC16:
 ### 8.2 Key INT 21h Functions to Watch
 
 | AH | Function | What to Watch |
-|----|----------|-----|
+|----|--|---|
 | 0Ah | Buffered input | User login |
 | 09h | Print string | Welcome screens |
 | 3Fh | Read file | .TXT, .DAT files |
@@ -543,7 +585,7 @@ u CS:IP
 ## 10. Quick Reference — Key Addresses
 
 | Address | What | How to Reach |
-|---------|--|-----|
+|---------|--|---|
 | `seg000:C629` (0x13D69) | Entry point | Debugger pauses here at startup |
 | `4799:0000` (0x04F0D0) | TP runtime init | Step from entry |
 | `4745:008A` (0x04EC1A) | Demo/card init wrapper | Step from entry (Call #3) |
@@ -553,3 +595,49 @@ u CS:IP
 | `0x04EC78` | Dispatch stub table | After ROM cluster |
 | `0x44BC6` | CS:IP 1978 fault region | Midop region (later) |
 | `0x44BE4` | Branch control | Midop region (later) |
+
+---
+
+## 11. DOSBox-X Debugger vs DOS DEBUG — Quick Comparison
+
+### DOSBox-X Built-in Debugger (This Document)
+
+```bash
+# Launch
+dosbox-x -break-start -debug -defaultdir /home/oo/sb/demo
+
+# Commands (at debugger prompt)
+r          # Show registers
+u <addr>   # Unassemble
+d <addr>   # Dump memory
+bpx <addr> # Set breakpoint
+g          # Go/run
+t          # Trace/step
+mem        # Memory map
+cpu        # CPU info
+seg <seg>  # Segment info
+stack      # Stack info
+int        # Interrupt table
+port       # Port status
+q          # Quit debugger
+```
+
+### DOS DEBUG Program (Inside DOS Shell)
+
+```bash
+# Launch (inside DOSBox-X DOS prompt)
+DEBUG
+
+# Commands (at DEBUG prompt)
+r        # Show registers
+u <addr> # Unassemble
+d <addr> # Dump memory
+e <addr> # Edit memory
+bpx <addr> # Set breakpoint
+g        # Go/run
+t        # Trace/step
+p        # Step over
+q        # Quit DEBUG
+```
+
+**Key difference:** DOSBox-X debugger can inspect emulator state (ports, segments, memory map, CPU flags). DOS DEBUG only sees what DOS programs can see.
