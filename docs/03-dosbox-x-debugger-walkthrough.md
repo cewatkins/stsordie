@@ -396,6 +396,96 @@ seg 4745
 
 ---
 
+## 5.4 HowTo — INT 21h EXEC Breakpoint Workflow
+
+This section shows a step-by-step workflow for catching the STS program's first INT 21h EXEC call (function 4Bh — load and execute a program), then tracing into the STS code from there.
+
+### Step-by-Step Commands
+
+```
+# Step 1: Mount C drive to the demo directory
+MOUNT C C:\TEMP\
+
+# Step 2: Change to the C: drive
+C:
+
+# Step 3: Run with debugger
+# If DOSBox-X was started with -break-start, the debugger is already active.
+# If not, launch DOSBox-X with: dosbox-x -break-start -debug -defaultdir C:\TEMP
+
+# Step 4: Set breakpoint on INT 21h function 4Bh (EXEC)
+# Option A: Break on all INT 21h calls
+bpx F000:0000    ; BIOS INT 21h entry point (varies by system)
+
+# Option B: Use INT 21h logging to catch EXEC calls
+log              ; toggle INT 21h logging
+
+# Step 5: Run to the breakpoint
+F5               ; Go — runs until breakpoint hits (or g in command line)
+
+# Step 6: Run the STS program
+STS12UC.EXE
+
+# When you see it stop at the breakpoint, inspect:
+
+# F000:DAC6 — ROM BIOS data area (INT 21h entry)
+u F000:DAC6 F000:DB00
+; Expected output:
+; F000:DAC6:  int 21
+; F000:D100:  sti
+; F000:D101:  callback 0038 (DOS Int 21)
+; F000:D106:  retf
+
+# F000:D100 — INT 21h callback entry
+u F000:D100 F000:D110
+; Shows the DOS interrupt handler entry point
+
+# Step 7: Step into the STS program
+F11              ; Step into (equivalent to 't' — traces into CALLs)
+; You'll now see the first call into the STS program code
+
+# Continue stepping through the STS program
+t                ; trace into next instruction
+t                ; continue stepping
+; Watch for:
+; - Card type gate at 0x04EB90
+; - Demo mode selection at 0x04EB99
+; - User login progression
+; - .DAT file writes (INT 21h function 3Ch/3Dh)
+```
+
+### Key ROM Addresses to Watch
+
+| Address | Purpose |
+|---------|-----|
+| `F000:DAC6` | INT 21h entry in ROM BIOS |
+| `F000:D100` | INT 21h callback entry (sti → callback → retf) |
+| `F000:FFF0` | CPU reset vector (reboot) |
+| `C000:0000` | Video BIOS ROM |
+| `C800:0000` | HDD Controller BIOS ROM |
+
+### When to Use This Approach
+
+- **When you want to catch the EXEC call** that loads the STS program
+- **When you want to inspect ROM BIOS state** before the program runs
+- **When you want to trace from the INT 21h handler** into the STS code
+- **When the entry-point approach** (stepping from 0x13D69) is too early and you want to start closer to the action
+
+### F11 vs t in DOSBox-X Debugger
+
+| Key | Action | Description |
+|-----|---|---|
+| `F11` | Step Into | Equivalent to `t` — steps into CALLs |
+| `F10` | Step Over | Equivalent to `p` — steps over CALLs |
+| `F5` | Go | Equivalent to `g` — runs to next breakpoint |
+| `F9` | Breakpoint | Set/clear breakpoint at current IP |
+| `F7` | Trace On | Enable trace mode |
+| `F8` | Trace Off | Disable trace mode |
+
+**Note:** F11 is the keyboard shortcut for "step into" in the DOSBox-X debugger GUI. In the command line, use `t` for the same action.
+
+---
+
 ## 5.5 HowTo — INT 21h EXEC Breakpoint Approach
 
 This section shows an alternative debugging workflow: set a breakpoint on INT 21h function 4Bh (EXEC — load and run a program), then trace into the STS program from there. This catches the moment the BBS tries to load/exec a file.
